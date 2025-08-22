@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertarungan di Puncak Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .comic-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .comic-title {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,255,255,0.3); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.6); }
+        }
+
+        .panel {
+            position: relative;
+            margin: 20px;
+            border: 4px solid #333;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            min-height: 400px;
+            overflow: hidden;
+            transform: scale(0.95);
+            opacity: 0;
+            animation: panelAppear 0.8s ease-out forwards;
+        }
+
+        .panel:nth-child(even) {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+        }
+
+        .panel:nth-child(3n) {
+            background: linear-gradient(135deg, #fdcb6e, #e17055);
+        }
+
+        @keyframes panelAppear {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .panel-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+        }
+
+        .panel-1 .panel-bg {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400"><defs><linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:%2387CEEB"/><stop offset="100%" style="stop-color:%23E0F6FF"/></linearGradient></defs><rect width="800" height="400" fill="url(%23sky)"/><path d="M0,300 Q200,250 400,280 T800,270 L800,400 L0,400 Z" fill="%236B8E23"/><circle cx="150" cy="120" r="40" fill="%23FFFFFF" opacity="0.8"/><circle cx="300" cy="80" r="60" fill="%23FFFFFF" opacity="0.6"/><circle cx="500" cy="100" r="50" fill="%23FFFFFF" opacity="0.7"/><circle cx="650" cy="90" r="45" fill="%23FFFFFF" opacity="0.8"/></svg>');
+        }
+
+        .character {
+            position: absolute;
+            width: 80px;
+            height: 120px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .character:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .character-head {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .ff-head { background: linear-gradient(45deg, #FF6B35, #F7931E); }
+        .pubg-head { background: linear-gradient(45deg, #FF8E53, #FF6B35); }
+        .ml-head { background: linear-gradient(45deg, #4ECDC4, #44A08D); }
+        .roblox-head { background: linear-gradient(45deg, #E74C3C, #C0392B); }
+        .blockblast-head { background: linear-gradient(45deg, #9B59B6, #8E44AD); }
+        .anti-head { background: linear-gradient(45deg, #34495E, #2C3E50); }
+
+        .character-body {
+            width: 40px;
+            height: 50px;
+            background: #3498DB;
+            margin: 0 auto;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            background: white;
+            border: 3px solid #333;
+            border-radius: 20px;
+            padding: 15px;
+            max-width: 250px;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.4;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: scale(0.8);
+            animation: bubbleAppear 0.5s ease-out 1s forwards;
+        }
+
+        @keyframes bubbleAppear {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        .bubble-left::before {
+            bottom: -15px;
+            left: 30px;
+            border-width: 15px 15px 0;
+            border-color: #333 transparent transparent;
+        }
+
+        .bubble-right::before {
+            bottom: -15px;
+            right: 30px;
+            border-width: 15px 15px 0;
+            border-color: #333 transparent transparent;
+        }
+
+        /* Panel 1 Characters */
+        .panel-1 .ff { top: 200px; left: 50px; }
+        .panel-1 .pubg { top: 180px; left: 200px; }
+        .panel-1 .ml { top: 160px; left: 350px; }
+        .panel-1 .roblox { top: 220px; left: 500px; }
+
+        .panel-1 .ff .speech-bubble { top: -80px; left: -100px; }
+        .panel-1 .pubg .speech-bubble { top: -90px; left: -150px; }
+        .panel-1 .ml .speech-bubble { top: -100px; left: -200px; }
+        .panel-1 .roblox .speech-bubble { top: -70px; left: -220px; }
+
+        /* Panel 2 Characters */
+        .panel-2 .ff { top: 150px; left: 80px; }
+        .panel-2 .pubg { top: 200px; left: 250px; }
+        .panel-2 .ml { top: 170px; left: 420px; }
+        .panel-2 .roblox { top: 140px; left: 600px; }
+
+        /* Panel 3 Characters */
+        .panel-3 .blockblast { top: 250px; left: 350px; }
+        .panel-3 .ff { top: 100px; left: 100px; }
+        .panel-3 .pubg { top: 120px; left: 250px; }
+        .panel-3 .ml { top: 100px; left: 500px; }
+        .panel-3 .roblox { top: 140px; left: 600px; }
+
+        /* Special effects */
+        .emote {
+            position: absolute;
+            font-size: 20px;
+            animation: float 1.5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ff .emote { top: -30px; left: 20px; }
+        .pubg .emote { top: -25px; right: 10px; }
+        .ml .emote { top: -35px; left: 15px; }
+
+        .scroll-indicator {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            background: #3498DB;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .control-btn:hover {
+            background: #2980B9;
+        }
+    </style>
+</head>
+<body>
+    <div class="comic-container">
+        <div class="comic-title">PERTARUNGAN DI PUNCAK GAME</div>
+        
+        <!-- Panel 1 -->
+        <div class="panel panel-1" data-panel="1">
+            <div class="panel-bg"></div>
+            
+            <div class="character ff">
+                <div class="character-head ff-head">FF</div>
+                <div class="character-body"></div>
+                <div class="emote">🕺</div>
+                <div class="speech-bubble bubble-left">
+                    "Bro, jelas lah Free Fire paling rame se-Indonesia. Lobby-ku penuh terus!"
+                </div>
+            </div>
+            
+            <div class="character pubg">
+                <div class="character-head pubg-head">PG</div>
+                <div class="character-body"></div>
+                <div class="emote">🔫</div>
+                <div class="speech-bubble bubble-left">
+                    "Ah, jangan halu. Aku battle royale yang OG, realistis lagi."
+                </div>
+            </div>
+            
+            <div class="character ml">
+                <div class="character-head ml-head">ML</div>
+                <div class="character-body"></div>
+                <div class="emote">🏆</div>
+                <div class="speech-bubble bubble-right">
+                    "Sini-sini, aku rajanya e-sport. Rank Epic aja masih noob."
+                </div>
+            </div>
+            
+            <div class="character roblox">
+                <div class="character-head roblox-head">RX</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Wkwk kalian ribut, aku udah bikin gunung virtual sendiri di Roblox."
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 2 -->
+        <div class="panel panel-2" data-panel="2">
+            <div class="character ff">
+                <div class="character-head ff-head">FF</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Skin-ku paling glowing, sultan banget!"
+                </div>
+            </div>
+            
+            <div class="character pubg">
+                <div class="character-head pubg-head">PG</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Bro, skin ku jaket camo lebih keren, no norak."
+                </div>
+            </div>
+            
+            <div class="character ml">
+                <div class="character-head ml-head">ML</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Hero-ku makin OP tiap update, auto comeback!"
+                </div>
+            </div>
+            
+            <div class="character roblox">
+                <div class="character-head roblox-head">RX</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Bodo amat, aku bisa bikin kalian semua di game-ku, versi blocky!"
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 3 -->
+        <div class="panel panel-3" data-panel="3">
+            <div class="character blockblast">
+                <div class="character-head blockblast-head">BB</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Yo, kenapa ribut-ribut di puncak gunung? Chill aja main puzzle, guys."
+                </div>
+            </div>
+            
+            <div class="character ff">
+                <div class="character-head ff-head">FF</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Hah?? Makhluk kotak dari mana nih?"
+                </div>
+            </div>
+            
+            <div class="character pubg">
+                <div class="character-head pubg-head">PG</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Hah?? Makhluk kotak dari mana nih?"
+                </div>
+            </div>
+            
+            <div class="character ml">
+                <div class="character-head ml-head">ML</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Hah?? Makhluk kotak dari mana nih?"
+                </div>
+            </div>
+            
+            <div class="character roblox">
+                <div class="character-head roblox-head">RX</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Hah?? Makhluk kotak dari mana nih?"
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 4 -->
+        <div class="panel panel-4" data-panel="4">
+            <div class="character ml">
+                <div class="character-head ml-head">ML</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Lah, rank ada gak?"
+                </div>
+            </div>
+            
+            <div class="character pubg">
+                <div class="character-head pubg-head">PG</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Weapon crate ada kah?"
+                </div>
+            </div>
+            
+            <div class="character ff">
+                <div class="character-head ff-head">FF</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Emote joget minimal 10 dong?"
+                </div>
+            </div>
+            
+            <div class="character blockblast">
+                <div class="character-head blockblast-head">BB</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Nggak ada bro, cuma susun balok. Anti toxic, anti ribut."
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 5 -->
+        <div class="panel panel-5" data-panel="5">
+            <div class="character anti-game">
+                <div class="character-head anti-head">📚</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Halah... main game tuh buang waktu. Lebih baik kalian baca buku pengembangan diri kayak aku."
+                </div>
+            </div>
+            
+            <div class="character ff" style="top: 150px; left: 150px;">
+                <div class="character-head ff-head">FF</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "SIAPAA LU BRO??"
+                </div>
+            </div>
+            
+            <div class="character pubg" style="top: 180px; left: 300px;">
+                <div class="character-head pubg-head">PG</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "SIAPAA LU BRO??"
+                </div>
+            </div>
+            
+            <div class="character ml" style="top: 150px; left: 450px;">
+                <div class="character-head ml-head">ML</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "SIAPAA LU BRO??"
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel 6 -->
+        <div class="panel panel-6" data-panel="6">
+            <div class="character ff" style="top: 120px; left: 50px;">
+                <div class="character-head ff-head">FF</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Cobain dulu match gua!"
+                </div>
+            </div>
+            
+            <div class="character pubg" style="top: 150px; left: 200px;">
+                <div class="character-head pubg-head">PG</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Ayo 1v1 di Erangel."
+                </div>
+            </div>
+            
+            <div class="character ml" style="top: 120px; left: 350px;">
+                <div class="character-head ml-head">ML</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Mabar bentar lah, no alibi."
+                </div>
+            </div>
+            
+            <div class="character blockblast" style="top: 180px; left: 500px;">
+                <div class="character-head blockblast-head">BB</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-right">
+                    "Kalau pusing, ini aja. Minimal otak lu nggak error."
+                </div>
+            </div>
+            
+            <div class="character anti-game" style="top: 280px; left: 300px;">
+                <div class="character-head anti-head">📚</div>
+                <div class="character-body"></div>
+                <div class="speech-bubble bubble-left">
+                    "Oke... oke... gua install semuanya 😅"
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-indicator">⬇</div>
+
+    <div class="control-panel">
+        <button class="control-btn" onclick="scrollToPanel(1)">Panel 1</button>
+        <button class="control-btn" onclick="scrollToPanel(2)">Panel 2</button>
+        <button class="control-btn" onclick="scrollToPanel(3)">Panel 3</button>
+        <button class="control-btn" onclick="scrollToPanel(4)">Panel 4</button>
+        <button class="control-btn" onclick="scrollToPanel(5)">Panel 5</button>
+        <button class="control-btn" onclick="scrollToPanel(6)">Panel 6</button>
+        <button class="control-btn" onclick="toggleAnimation()">Pause/Play</button>
+    </div>
+
+    <script>
+        let animationPaused = false;
+        let currentPanel = 1;
+
+        // Scroll to specific panel
+        function scrollToPanel(panelNumber) {
+            const panel = document.querySelector(`.panel-${panelNumber}`);
+            if (panel) {
+                panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                currentPanel = panelNumber;
+            }
+        }
+
+        // Toggle animations
+        function toggleAnimation() {
+            animationPaused = !animationPaused;
+            const style = document.createElement('style');
+            
+            if (animationPaused) {
+                style.textContent = `
+                    *, *::before, *::after {
+                        animation-play-state: paused !important;
+                    }
+                `;
+            } else {
+                style.textContent = `
+                    *, *::before, *::after {
+                        animation-play-state: running !important;
+                    }
+                `;
+            }
+            
+            document.head.appendChild(style);
+            setTimeout(() => document.head.removeChild(style), 100);
+        }
+
+        // Character click interactions
+        document.querySelectorAll('.character').forEach(character => {
+            character.addEventListener('click', function() {
+                // Add click effect
+                this.style.transform = 'scale(1.2) rotate(5deg)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.1)';
+                }, 200);
+                
+                // Show/hide speech bubble
+                const bubble = this.querySelector('.speech-bubble');
+                if (bubble) {
+                    bubble.style.display = bubble.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+            
+            // Hover effects
+            character.addEventListener('mouseenter', function() {
+                const head = this.querySelector('.character-head');
+                if (head) {
+                    head.style.animation = 'bounce 0.5s ease';
+                }
+            });
+        });
+
+        // Auto-scroll detection
+        let observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const panelNum = entry.target.dataset.panel;
+                    currentPanel = parseInt(panelNum);
+                    
+                    // Trigger panel-specific animations
+                    setTimeout(() => {
+                        triggerPanelEffects(panelNum);
+                    }, 500);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.panel').forEach(panel => {
+            observer.observe(panel);
+        });
+
+        function triggerPanelEffects(panelNum) {
+            const panel = document.querySelector(`.panel-${panelNum}`);
+            
+            switch(parseInt(panelNum)) {
+                case 1:
+                    // Add mountain climbing effect
+                    panel.style.background = 'linear-gradient(135deg, #74b9ff, #0984e3, #87CEEB)';
+                    break;
+                case 3:
+                    // Block Blast entrance effect
+                    const blockBlast = panel.querySelector('.blockblast');
+                    if (blockBlast) {
+                        blockBlast.style.animation = 'bounce 1s ease-out';
+                    }
+                    break;
+                case 6:
+                    // Final showdown effect
+                    panel.style.background = 'linear-gradient(135deg, #ff7675, #fd79a8, #fdcb6e)';
+                    break;
+            }
+        }
+
+        // Initial setup
+        window.addEventListener('load', () => {
+            // Stagger panel animations
+            document.querySelectorAll('.panel').forEach((panel, index) => {
+                panel.style.animationDelay = `${index * 0.3}s`;
+            });
+            
+            // Auto-scroll hint
+            setTimeout(() => {
+                document.querySelector('.scroll-indicator').style.animation = 'pulse 1s infinite';
+            }, 3000);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowDown':
+                    if (currentPanel < 6) scrollToPanel(currentPanel + 1);
+                    break;
+                case 'ArrowUp':
+                    if (currentPanel > 1) scrollToPanel(currentPanel - 1);
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    toggleAnimation();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>
